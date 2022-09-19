@@ -10,7 +10,7 @@ const Product = ({ name, description, price }: IProduct) => {
 
             <h1>$ {price}</h1>
 
-            <PayPalButtons />
+            <PayPalButtons style={{ layout: 'horizontal' }} />
         </div>
     )
 }
