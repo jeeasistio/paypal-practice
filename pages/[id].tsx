@@ -1,9 +1,15 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import Products from '../components/Products'
+import { useRouter } from 'next/router'
+import Product from '../components/Product'
+import { products } from '../lib/products'
 import styles from '../styles/Home.module.css'
 
-const Home: NextPage = () => {
+const Phone: NextPage = () => {
+    const router = useRouter()
+
+    const product = products.find((product) => product.id === router.query.id)
+
     return (
         <div className={styles.container}>
             <Head>
@@ -13,11 +19,11 @@ const Home: NextPage = () => {
 
             <main className={styles.main}>
                 <div>
-                    <Products />
+                    {product && <Product {...product} />}
                 </div>
             </main>
         </div>
     )
 }
 
-export default Home
+export default Phone
