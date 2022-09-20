@@ -21,11 +21,7 @@ const Product = ({ name, description, price, id }: IProduct) => {
 
             <h1>$ {price}</h1>
 
-            <PayPalButtons
-                style={{ layout: 'horizontal' }}
-                createOrder={handleCreateOrder}
-                onApprove={handleOnApprove}
-            />
+            <PayPalButtons style={{ layout: 'vertical' }} createOrder={handleCreateOrder} onApprove={handleOnApprove} />
         </div>
     )
 }

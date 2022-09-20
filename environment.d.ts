@@ -3,6 +3,7 @@ declare global {
         interface ProcessEnv extends EnvTypes {
             NEXT_PUBLIC_PAYPAL_CLIENT_ID: string
             PAYPAL_CLIENT_SECRET: string
+            MONGO_URL: string
         }
     }
 }
