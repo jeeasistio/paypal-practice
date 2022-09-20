@@ -8,6 +8,9 @@
         "start": "next start",
         "lint": "next lint"
     },
+    "prisma": {
+        "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+    },
     "dependencies": {
         "@paypal/checkout-server-sdk": "^1.0.3",
         "@paypal/react-paypal-js": "^7.8.1",
@@ -25,6 +28,7 @@
         "eslint": "8.23.1",
         "eslint-config-next": "12.3.0",
         "prisma": "^4.3.1",
+        "ts-node": "^10.9.1",
         "typescript": "4.8.3"
     }
 }
