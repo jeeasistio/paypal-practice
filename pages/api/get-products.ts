@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { captureOrder } from '../../helpers/paypal'
+import { prisma } from '../../helpers/prisma'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const capturedOrder = await captureOrder(req.body.id)
+    const products = await prisma.product.findMany()
 
-    res.status(200).json({})
+    res.status(200).json(products)
 }

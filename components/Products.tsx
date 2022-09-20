@@ -1,13 +1,12 @@
+import { Product } from '@prisma/client'
 import Link from 'next/link'
-import React from 'react'
-import { products } from '../lib/products'
 
-const Products = () => {
+const Products = ({ products }: { products?: Product[] }) => {
     return (
         <div>
             <h1>Products</h1>
 
-            {products.map((product, index) => (
+            {products?.map((product, index) => (
                 <div key={index} style={{ padding: 12 }}>
                     <h3>{product.name}</h3>
                     <h2>$ {product.price}</h2>

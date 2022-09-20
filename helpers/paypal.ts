@@ -1,12 +1,9 @@
 import paypal from '@paypal/checkout-server-sdk'
-import { products } from '../lib/products'
+import { prisma } from './prisma'
 
 export interface CreateOrder {
     id: string
-    intent: string
     status: string
-    purchase_units: PurchaseUnit[]
-    create_time: Date
     links: Link[]
 }
 
@@ -68,10 +65,10 @@ export interface CaptureOrder {
     id: string
     status: string
     purchase_units: PurchaseUnitt[]
-    payer: Payerr
+    payer: Payer
     links: Link[]
 }
-interface Payerr {
+interface Payer {
     name: Name
     email_address: string
     payer_id: string
@@ -121,7 +118,9 @@ const environment = new paypal.core.SandboxEnvironment(
 const client = new paypal.core.PayPalHttpClient(environment)
 
 export const createOrder = async (productId: string) => {
-    const product = products.find((product) => product.id === productId)!
+    const product = await prisma.product.findFirst({ where: { id: productId } })
+
+    if (!product) return null
 
     const { name, price, description } = product
 
@@ -133,9 +132,9 @@ export const createOrder = async (productId: string) => {
                 description: `${name} purchase`,
                 amount: {
                     currency_code: 'USD',
-                    value: `${price}.00`,
+                    value: price.toFixed(2),
                     breakdown: {
-                        item_total: { value: `${price}.00`, currency_code: 'USD' },
+                        item_total: { value: price.toFixed(2), currency_code: 'USD' },
                         discount: { value: `0`, currency_code: 'USD' },
                         handling: { currency_code: 'USD', value: '0' },
                         insurance: { currency_code: 'USD', value: '0' },
@@ -149,12 +148,15 @@ export const createOrder = async (productId: string) => {
                         name,
                         category: 'PHYSICAL_GOODS' as paypal.orders.Category,
                         quantity: '1',
-                        unit_amount: { value: `${price}.00`, currency_code: 'USD' },
+                        unit_amount: { value: price.toFixed(2), currency_code: 'USD' },
                         description,
                     },
                 ],
             },
         ],
+        application_context: {
+            shipping_preference: 'NO_SHIPPING',
+        },
     })
 
     return (await client.execute(request)).result as CreateOrder

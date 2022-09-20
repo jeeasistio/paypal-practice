@@ -1,10 +1,10 @@
 import React from 'react'
 import axios from 'axios'
-import { IProduct } from '../lib/products'
 import { PayPalButtons } from '@paypal/react-paypal-js'
 import { CreateOrder } from '../helpers/paypal'
+import { Product } from '@prisma/client'
 
-const Product = ({ name, description, price, id }: IProduct) => {
+const Product = ({ name, description, price, id }: Product) => {
     const handleCreateOrder: NonNullable<typeof PayPalButtons['defaultProps']>['createOrder'] = async () => {
         const res = await axios.post<CreateOrder>('/api/create-order', { id })
         return res.data.id
