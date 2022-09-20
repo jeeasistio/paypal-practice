@@ -118,52 +118,60 @@ const environment = new paypal.core.SandboxEnvironment(
 const client = new paypal.core.PayPalHttpClient(environment)
 
 export const createOrder = async (productId: string) => {
-    const product = await prisma.product.findFirst({ where: { id: productId } })
+    try {
+        const product = await prisma.product.findFirst({ where: { id: productId } })
 
-    if (!product) return null
+        if (!product) return null
 
-    const { name, price, description } = product
+        const { name, price, description } = product
 
-    const request = new paypal.orders.OrdersCreateRequest()
-    request.requestBody({
-        intent: 'CAPTURE',
-        purchase_units: [
-            {
-                description: `${name} purchase`,
-                amount: {
-                    currency_code: 'USD',
-                    value: price.toFixed(2),
-                    breakdown: {
-                        item_total: { value: price.toFixed(2), currency_code: 'USD' },
-                        discount: { value: `0`, currency_code: 'USD' },
-                        handling: { currency_code: 'USD', value: '0' },
-                        insurance: { currency_code: 'USD', value: '0' },
-                        shipping: { currency_code: 'USD', value: '0' },
-                        shipping_discount: { currency_code: 'USD', value: '0' },
-                        tax_total: { value: '0', currency_code: 'USD' },
+        const request = new paypal.orders.OrdersCreateRequest()
+        request.requestBody({
+            intent: 'CAPTURE',
+            purchase_units: [
+                {
+                    description: `${name} purchase`,
+                    amount: {
+                        currency_code: 'USD',
+                        value: price.toFixed(2),
+                        breakdown: {
+                            item_total: { value: price.toFixed(2), currency_code: 'USD' },
+                            discount: { value: `0`, currency_code: 'USD' },
+                            handling: { currency_code: 'USD', value: '0' },
+                            insurance: { currency_code: 'USD', value: '0' },
+                            shipping: { currency_code: 'USD', value: '0' },
+                            shipping_discount: { currency_code: 'USD', value: '0' },
+                            tax_total: { value: '0', currency_code: 'USD' },
+                        },
                     },
+                    items: [
+                        {
+                            name,
+                            category: 'PHYSICAL_GOODS' as paypal.orders.Category,
+                            quantity: '1',
+                            unit_amount: { value: price.toFixed(2), currency_code: 'USD' },
+                            description,
+                        },
+                    ],
                 },
-                items: [
-                    {
-                        name,
-                        category: 'PHYSICAL_GOODS' as paypal.orders.Category,
-                        quantity: '1',
-                        unit_amount: { value: price.toFixed(2), currency_code: 'USD' },
-                        description,
-                    },
-                ],
+            ],
+            application_context: {
+                shipping_preference: 'NO_SHIPPING',
             },
-        ],
-        application_context: {
-            shipping_preference: 'NO_SHIPPING',
-        },
-    })
+        })
 
-    return (await client.execute(request)).result as CreateOrder
+        return (await client.execute(request)).result as CreateOrder
+    } catch (error) {
+        return null
+    }
 }
 
 export const captureOrder = async (orderId: string) => {
-    const request = new paypal.orders.OrdersCaptureRequest(orderId)
+    try {
+        const request = new paypal.orders.OrdersCaptureRequest(orderId)
 
-    return (await client.execute(request)).result as CaptureOrder
+        return (await client.execute(request)).result as CaptureOrder
+    } catch (error) {
+        return null
+    }
 }
