@@ -125,55 +125,43 @@ export const createOrder = async (productId: string) => {
 
     const { name, price, description } = product
 
-    try {
-        const request = new paypal.orders.OrdersCreateRequest()
-        request.requestBody({
-            intent: 'CAPTURE',
-            purchase_units: [
-                {
-                    description: `${name} purchase`,
-                    amount: {
-                        currency_code: 'USD',
-                        value: `${price}.00`,
-                        breakdown: {
-                            item_total: { value: `${price}.00`, currency_code: 'USD' },
-                            discount: { value: `0`, currency_code: 'USD' },
-                            handling: { currency_code: 'USD', value: '0' },
-                            insurance: { currency_code: 'USD', value: '0' },
-                            shipping: { currency_code: 'USD', value: '0' },
-                            shipping_discount: { currency_code: 'USD', value: '0' },
-                            tax_total: { value: '0', currency_code: 'USD' },
-                        },
+    const request = new paypal.orders.OrdersCreateRequest()
+    request.requestBody({
+        intent: 'CAPTURE',
+        purchase_units: [
+            {
+                description: `${name} purchase`,
+                amount: {
+                    currency_code: 'USD',
+                    value: `${price}.00`,
+                    breakdown: {
+                        item_total: { value: `${price}.00`, currency_code: 'USD' },
+                        discount: { value: `0`, currency_code: 'USD' },
+                        handling: { currency_code: 'USD', value: '0' },
+                        insurance: { currency_code: 'USD', value: '0' },
+                        shipping: { currency_code: 'USD', value: '0' },
+                        shipping_discount: { currency_code: 'USD', value: '0' },
+                        tax_total: { value: '0', currency_code: 'USD' },
                     },
-                    items: [
-                        {
-                            name,
-                            category: 'PHYSICAL_GOODS' as paypal.orders.Category,
-                            quantity: '1',
-                            unit_amount: { value: `${price}.00`, currency_code: 'USD' },
-                            description,
-                        },
-                    ],
                 },
-            ],
-        })
+                items: [
+                    {
+                        name,
+                        category: 'PHYSICAL_GOODS' as paypal.orders.Category,
+                        quantity: '1',
+                        unit_amount: { value: `${price}.00`, currency_code: 'USD' },
+                        description,
+                    },
+                ],
+            },
+        ],
+    })
 
-        const response = await client.execute(request)
-        console.log('🚀 ~ file: paypal.ts ~ line 48 ~ createOrder ~ response', response)
-
-        return response
-    } catch (error) {
-        console.log(error)
-    }
+    return (await client.execute(request)).result as CreateOrder
 }
 
 export const captureOrder = async (orderId: string) => {
-    try {
-        const request = new paypal.orders.OrdersCaptureRequest(orderId)
+    const request = new paypal.orders.OrdersCaptureRequest(orderId)
 
-        const response = await client.execute(request)
-        console.log('🚀 ~ file: paypal.ts ~ line 55 ~ captureOrder ~ response', response)
-    } catch (error) {
-        console.log(error)
-    }
+    return (await client.execute(request)).result as CaptureOrder
 }

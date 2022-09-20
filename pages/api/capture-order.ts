@@ -1,14 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createOrder } from '../../helpers/paypal'
+import { captureOrder } from '../../helpers/paypal'
 
-type NextApiRequestWithData = NextApiRequest & {
-    id: string
-}
-
-export default async function handler(req: NextApiRequestWithData, res: NextApiResponse) {
-    await createOrder(req.body)
-    console.log(req.body)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    await captureOrder(req.body.id)
 
     res.status(200).json({})
 }
