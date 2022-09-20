@@ -120,8 +120,10 @@ const client = new paypal.core.PayPalHttpClient(environment)
 export const createOrder = async (productId: string) => {
     try {
         const product = await prisma.product.findFirst({ where: { id: productId } })
+        const user = await prisma.user.findFirst()
 
         if (!product) return null
+        if (!user) return null
 
         const { name, price, description } = product
 
@@ -160,7 +162,18 @@ export const createOrder = async (productId: string) => {
             },
         })
 
-        return (await client.execute(request)).result as CreateOrder
+        const requestResult = (await client.execute(request)).result as CreateOrder
+
+        await prisma.purchases.create({
+            data: {
+                productId: product.id,
+                userId: user.id,
+                status: requestResult.status,
+                orderID: requestResult.id,
+            },
+        })
+
+        return requestResult
     } catch (error) {
         return null
     }
