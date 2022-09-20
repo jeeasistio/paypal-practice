@@ -1,11 +1,11 @@
 import paypal from '@paypal/checkout-server-sdk'
 import { products } from '../lib/products'
 
-let environment = new paypal.core.SandboxEnvironment(
+const environment = new paypal.core.SandboxEnvironment(
     process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
     process.env.PAYPAL_CLIENT_SECRET
 )
-let client = new paypal.core.PayPalHttpClient(environment)
+const client = new paypal.core.PayPalHttpClient(environment)
 
 export const createOrder = async (productId: string) => {
     const product = products.find((product) => product.id === productId)!
@@ -46,11 +46,13 @@ export const createOrder = async (productId: string) => {
 
     const response = await client.execute(request)
     console.log('🚀 ~ file: paypal.ts ~ line 48 ~ createOrder ~ response', response)
+
+    return response
 }
 
 export const captureOrder = async (orderId: string) => {
     const request = new paypal.orders.OrdersCaptureRequest(orderId)
 
-    let response = await client.execute(request)
+    const response = await client.execute(request)
     console.log('🚀 ~ file: paypal.ts ~ line 55 ~ captureOrder ~ response', response)
 }
