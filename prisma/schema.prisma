@@ -22,7 +22,7 @@ model Product {
 
 model Purchases {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderID   String
+  orderID   String   @unique
   status    String
   createdAt DateTime @default(now())
   Product   Product  @relation(fields: [productId], references: [id])

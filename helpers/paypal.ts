@@ -183,7 +183,14 @@ export const captureOrder = async (orderId: string) => {
     try {
         const request = new paypal.orders.OrdersCaptureRequest(orderId)
 
-        return (await client.execute(request)).result as CaptureOrder
+        const requestResult = (await client.execute(request)).result as CaptureOrder
+
+        await prisma.purchases.update({
+            where: { orderID: orderId },
+            data: { status: requestResult.status },
+        })
+
+        return requestResult
     } catch (error) {
         return null
     }
