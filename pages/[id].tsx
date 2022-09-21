@@ -4,6 +4,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
+import Nav from '../components/Nav'
 import Product from '../components/Product'
 import styles from '../styles/Home.module.css'
 
@@ -26,6 +27,8 @@ const Phone: NextPage = () => {
                 <title>Product Purchase</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+
+            <Nav />
 
             <main className={styles.main}>
                 <div>{product && <Product {...product} />}</div>

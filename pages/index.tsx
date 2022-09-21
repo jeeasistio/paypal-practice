@@ -3,6 +3,7 @@ import axios from 'axios'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
+import Nav from '../components/Nav'
 import Products from '../components/Products'
 import styles from '../styles/Home.module.css'
 
@@ -24,6 +25,8 @@ const Home: NextPage = () => {
                 <title>Product Purchase</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
+
+            <Nav />
 
             <main className={styles.main}>
                 <div>
