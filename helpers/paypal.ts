@@ -203,7 +203,7 @@ export const captureOrder = async (orderId: string) => {
             where: { order_id: orderId },
             data: {
                 status: requestResult.status,
-                paypal: {
+                Paypal: {
                     update: {
                         payer_info: {
                             address: requestResult.payer.address,

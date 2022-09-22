@@ -3,10 +3,11 @@ import { PayPalButtons } from '@paypal/react-paypal-js'
 import { CreateOrder } from '../helpers/paypal'
 import { Product } from '@prisma/client'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { ChangeEventHandler, useState } from 'react'
 
 const Product = ({ name, description, price, id }: Product) => {
     const [quantity, setQuantity] = useState(1)
+    const [confirmedQuantity, setConfirmedQuantity] = useState(quantity)
 
     const router = useRouter()
     const handleCreateOrder: NonNullable<typeof PayPalButtons['defaultProps']>['createOrder'] = async () => {
@@ -22,12 +23,25 @@ const Product = ({ name, description, price, id }: Product) => {
         }
     }
 
+    const handleQuantity: ChangeEventHandler<HTMLInputElement> = (e) => {
+        setQuantity(Number(e.target.value))
+    }
+
+    const handleConfirmQuantity = () => {
+        setConfirmedQuantity(quantity)
+    }
+
     return (
         <div>
             <h2>{name}</h2>
             <p>{description}</p>
 
-            <h1>$ {price}</h1>
+            <h1>$ {price.toFixed(2)}</h1>
+
+            <div>
+                <h2>Total</h2>
+                <h1 color="#cc0000">$ {(price * Number(confirmedQuantity)).toFixed(2)}</h1>
+            </div>
 
             <div style={{ marginBottom: 12 }}>
                 <label htmlFor="quantity">Quantity: </label>
@@ -36,12 +50,16 @@ const Product = ({ name, description, price, id }: Product) => {
                     min={1}
                     type="number"
                     value={quantity}
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                    style={{ padding: 8 }}
+                    onChange={handleQuantity}
+                    style={{ padding: 8, marginRight: 8 }}
                 />
+                <button onClick={handleConfirmQuantity} style={{ padding: '8px 16px' }}>
+                    Confirm
+                </button>
             </div>
 
             <PayPalButtons
+                forceReRender={[confirmedQuantity]}
                 style={{ layout: 'vertical' }}
                 createOrder={handleCreateOrder}
                 onApprove={handleOnApprove}

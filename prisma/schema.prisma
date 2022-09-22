@@ -36,7 +36,7 @@ model Purchases {
   product_id String   @db.ObjectId
   User       User     @relation(fields: [user_id], references: [id])
   user_id    String   @db.ObjectId
-  paypal     Paypal   @relation(fields: [paypal_id], references: [id])
+  Paypal     Paypal   @relation(fields: [paypal_id], references: [id])
   paypal_id  String   @db.ObjectId
 }
 
