@@ -120,7 +120,7 @@ const environment = new paypal.core.SandboxEnvironment(
 )
 const client = new paypal.core.PayPalHttpClient(environment)
 
-export const createOrder = async (productId: string) => {
+export const createOrder = async (productId: string, quantity: number) => {
     try {
         const product = await prisma.product.findFirst({ where: { id: productId } })
         const user = await prisma.user.findFirst()
@@ -136,12 +136,12 @@ export const createOrder = async (productId: string) => {
             intent: 'CAPTURE',
             purchase_units: [
                 {
-                    description: `${name} purchase`,
+                    description: `${name} Purchase`,
                     amount: {
                         currency_code: 'USD',
-                        value: price.toFixed(2),
+                        value: (price * quantity).toFixed(2),
                         breakdown: {
-                            item_total: { value: price.toFixed(2), currency_code: 'USD' },
+                            item_total: { value: (price * quantity).toFixed(2), currency_code: 'USD' },
                             discount: { value: `0`, currency_code: 'USD' },
                             handling: { currency_code: 'USD', value: '0' },
                             insurance: { currency_code: 'USD', value: '0' },
@@ -154,7 +154,7 @@ export const createOrder = async (productId: string) => {
                         {
                             name,
                             category: 'PHYSICAL_GOODS' as paypal.orders.Category,
-                            quantity: '1',
+                            quantity: quantity.toString(),
                             unit_amount: { value: price.toFixed(2), currency_code: 'USD' },
                             description,
                         },
@@ -168,12 +168,22 @@ export const createOrder = async (productId: string) => {
 
         const requestResult = (await client.execute(request)).result as CreateOrder
 
-        await prisma.purchases.create({
+        await prisma.paypal.create({
             data: {
-                productId: product.id,
-                userId: user.id,
-                status: requestResult.status,
-                orderID: requestResult.id,
+                purchase_info: {
+                    amount: requestResult.purchase_units[0].amount,
+                    description: requestResult.purchase_units[0].description,
+                    payee: requestResult.purchase_units[0].payee,
+                    items: requestResult.purchase_units[0].items,
+                },
+                Purchases: {
+                    create: {
+                        product_id: product.id,
+                        user_id: user.id,
+                        order_id: requestResult.id,
+                        status: requestResult.status,
+                    },
+                },
             },
         })
 
@@ -190,8 +200,20 @@ export const captureOrder = async (orderId: string) => {
         const requestResult = (await client.execute(request)).result as CaptureOrder
 
         await prisma.purchases.update({
-            where: { orderID: orderId },
-            data: { status: requestResult.status },
+            where: { order_id: orderId },
+            data: {
+                status: requestResult.status,
+                paypal: {
+                    update: {
+                        payer_info: {
+                            address: requestResult.payer.address,
+                            id: requestResult.payer.payer_id,
+                            name: requestResult.payer.name,
+                            email: requestResult.payer.email_address,
+                        },
+                    },
+                },
+            },
         })
 
         return requestResult
