@@ -22,17 +22,19 @@ const HistoryList = ({ history }: { history?: THistory }) => {
                                 {date.getMonth()} / {date.getDate()} / {date.getFullYear()}
                             </p>
                             <h5 style={{ marginLeft: 34 }}>$ {his.Paypal.purchase_info.items[0].unit_amount.value}</h5>
-                            <h3 style={{ marginLeft: 34 }}>
+                            <h3 style={{ marginLeft: 34, color: '#ff5050' }}>
                                 $ {his.Paypal.purchase_info.amount.breakdown.item_total.value}
                             </h3>
                         </div>
 
-                        <h5 style={{ color: '#ccc', marginBottom: 0 }}>Payed By: </h5>
+                        <p style={{ color: '#ccc', marginBottom: 0, marginTop: 0 }}>Paid By: </p>
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <h4 style={{ width: 200 }}>
+                            <h5 style={{ width: 200, marginTop: 8, marginBottom: 8 }}>
                                 {his.Paypal.payer_info?.name?.given_name} {his.Paypal.payer_info?.name?.surname}
-                            </h4>
-                            <p>{his.Paypal.payer_info?.email}</p>
+                            </h5>
+                            <p style={{ marginTop: 0, marginBottom: 0, fontSize: '0.9rem', color: '#ccc' }}>
+                                {his.Paypal.payer_info?.email}
+                            </p>
                         </div>
                         <hr />
                     </>

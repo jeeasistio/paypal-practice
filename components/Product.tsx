@@ -40,7 +40,7 @@ const Product = ({ name, description, price, id }: Product) => {
 
             <div>
                 <h2>Total</h2>
-                <h1 color="#cc0000">$ {(price * Number(confirmedQuantity)).toFixed(2)}</h1>
+                <h1 color="#ff5050">$ {(price * Number(confirmedQuantity)).toFixed(2)}</h1>
             </div>
 
             <div style={{ marginBottom: 12 }}>
