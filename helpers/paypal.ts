@@ -3,7 +3,10 @@ import { prisma } from './prisma'
 
 export interface CreateOrder {
     id: string
+    intent: string
     status: string
+    purchase_units: CreatePurchaseUnit[]
+    create_time: Date
     links: Link[]
 }
 
@@ -13,7 +16,7 @@ interface Link {
     method: string
 }
 
-interface PurchaseUnit {
+interface CreatePurchaseUnit {
     reference_id: string
     amount: Amount
     payee: Payee
@@ -28,23 +31,23 @@ interface Amount {
 }
 
 interface Breakdown {
-    item_total: Discount
-    shipping: Discount
-    handling: Discount
-    tax_total: Discount
-    insurance: Discount
-    shipping_discount: Discount
-    discount: Discount
+    item_total: ValueCurrency
+    shipping: ValueCurrency
+    handling: ValueCurrency
+    tax_total: ValueCurrency
+    insurance: ValueCurrency
+    shipping_discount: ValueCurrency
+    discount: ValueCurrency
 }
 
-interface Discount {
+interface ValueCurrency {
     currency_code: string
     value: string
 }
 
 interface Item {
     name: string
-    unit_amount: Discount
+    unit_amount: ValueCurrency
     quantity: string
     description: string
     category: string
@@ -64,7 +67,7 @@ interface Link {
 export interface CaptureOrder {
     id: string
     status: string
-    purchase_units: PurchaseUnitt[]
+    purchase_units: CapturePurchaseUnit[]
     payer: Payer
     links: Link[]
 }
@@ -81,7 +84,7 @@ interface Name {
 interface Address {
     country_code: string
 }
-interface PurchaseUnitt {
+interface CapturePurchaseUnit {
     reference_id: string
     payments: Payments
 }
@@ -128,6 +131,7 @@ export const createOrder = async (productId: string) => {
         const { name, price, description } = product
 
         const request = new paypal.orders.OrdersCreateRequest()
+        request.prefer('return=representation')
         request.requestBody({
             intent: 'CAPTURE',
             purchase_units: [

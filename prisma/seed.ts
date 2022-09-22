@@ -8,14 +8,14 @@ const user = {
 
 const products = [
     {
-        name: 'Phone XL',
+        name: 'Phone Mini',
         price: 99,
-        description: 'A large phone with one of the best screens',
+        description: 'A phone with vivid colors for a compact phone',
     },
     {
-        name: 'Phone Mini',
+        name: 'Phone XL',
         price: 199,
-        description: 'A phone with vivid colors for a compact phone',
+        description: 'A large phone with one of the best screens',
     },
     {
         name: 'Phone Pro',
@@ -25,6 +25,8 @@ const products = [
 ]
 
 async function main() {
+    await prisma.$runCommandRaw({ dropDatabase: 1 })
+
     await prisma.user.create({ data: user })
     await prisma.product.createMany({ data: products })
 }

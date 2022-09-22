@@ -10,30 +10,92 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  products         Product[]
+  purchase_history Purchases[]
+}
+
 model Product {
   id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   price       Float
   description String
-  User        User?       @relation(fields: [userId], references: [id])
-  userId      String?     @db.ObjectId
+  User        User?       @relation(fields: [user_id], references: [id])
+  user_id     String?     @db.ObjectId
   Purchases   Purchases[]
 }
 
 model Purchases {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderID   String   @unique
-  status    String
-  createdAt DateTime @default(now())
-  Product   Product  @relation(fields: [productId], references: [id])
-  productId String   @db.ObjectId
-  User      User     @relation(fields: [userId], references: [id])
-  userId    String   @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  order_id   String   @unique
+  status     String
+  created_at DateTime @default(now())
+  Product    Product  @relation(fields: [product_id], references: [id])
+  product_id String   @db.ObjectId
+  User       User     @relation(fields: [user_id], references: [id])
+  user_id    String   @db.ObjectId
 }
 
-model User {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  name            String
-  products        Product[]
-  purchaseHistory Purchases[]
+type Paypal {
+  payer_info    PayerInfo
+  purchase_info PurchaseInfo
+}
+
+type PayerInfo {
+  id      String
+  address String
+  email   String
+  name    String
+}
+
+type PayerName {
+  given_name String
+  last_name  String
+}
+
+type PayerAddress {
+  country_code String
+}
+
+type PurchaseInfo {
+  amount      Amount
+  payee       Payee
+  description String
+  items       Item[]
+}
+
+type Amount {
+  currency_code String
+  value         String
+  breakdown     Breakdown
+}
+
+type Payee {
+  email_address String
+  merchant_id   String
+}
+
+type Breakdown {
+  item_total        ValueCurrency
+  shipping          ValueCurrency
+  handling          ValueCurrency
+  tax_total         ValueCurrency
+  insurance         ValueCurrency
+  shipping_discount ValueCurrency
+  discount          ValueCurrency
+}
+
+type ValueCurrency {
+  currency_code String
+  value         String
+}
+
+type Item {
+  name        String
+  unit_amount ValueCurrency
+  quantity    String
+  description String
+  category    String
 }
